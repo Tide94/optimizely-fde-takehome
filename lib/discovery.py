@@ -1,14 +1,12 @@
 """Opal Tool Manifest builder.
 
-Opal does not consume OpenAPI specs directly — it expects a custom manifest
-at /discovery describing the tools this service exposes. Building it by hand
-(rather than from an OpenAPI conversion) keeps the manifest derived from the
-same Pydantic source of truth as our request validation.
+Opal's validator enforces an OCP-style function format: root key `functions`,
+parameters as an array of `{name, type, description, required}` descriptors.
+This shape differs from both the public Opal docs (which describe a `tools`
+root key) and JSON Schema conventions (which would key parameters by name);
+it was confirmed against the validator itself and via a verbatim example.
 
-Note: Opal's actual validator enforces a slightly different schema than the
-public docs describe. Root key must be `functions` (not `tools`), and
-`parameters` must be a keyed object (not a list). Spec link is still useful
-context, but the shape below was confirmed empirically against the validator:
+Spec context (note: validator is stricter than this doc):
 https://support.optimizely.com/hc/en-us/articles/39190444893837
 """
 
@@ -29,8 +27,9 @@ OPAL_MANIFEST: dict[str, Any] = {
             ),
             "endpoint": "/fetch_reviews",
             "method": "POST",
-            "parameters": {
-                "brand": {
+            "parameters": [
+                {
+                    "name": "brand",
                     "type": "string",
                     "description": (
                         "Brand or product name to fetch reviews for. "
@@ -41,7 +40,8 @@ OPAL_MANIFEST: dict[str, Any] = {
                     ),
                     "required": True,
                 },
-                "sources": {
+                {
+                    "name": "sources",
                     "type": "array",
                     "description": (
                         "Sources to fetch from. Allowed values in the array: "
@@ -51,7 +51,8 @@ OPAL_MANIFEST: dict[str, Any] = {
                     ),
                     "required": False,
                 },
-                "limit_per_source": {
+                {
+                    "name": "limit_per_source",
                     "type": "number",
                     "description": (
                         "Maximum items to fetch per source. Integer between 1 "
@@ -60,7 +61,8 @@ OPAL_MANIFEST: dict[str, Any] = {
                     ),
                     "required": False,
                 },
-                "time_window_days": {
+                {
+                    "name": "time_window_days",
                     "type": "number",
                     "description": (
                         "Only return items from the last N days. Integer >= 1. "
@@ -69,7 +71,7 @@ OPAL_MANIFEST: dict[str, Any] = {
                     ),
                     "required": False,
                 },
-            },
+            ],
         }
     ]
 }

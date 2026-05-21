@@ -122,9 +122,9 @@ class TestFetchReviewsEndpoint(unittest.TestCase):
 def test_discovery_returns_manifest():
     """The discovery endpoint must return Opal's validator-enforced schema.
 
-    Opal validator requires root key 'functions' (not 'tools') and parameters
-    as a keyed object (not array). Confirmed empirically — the docs describe
-    a different shape than the validator enforces.
+    Root key 'functions'. Parameters as ARRAY of objects (each with its own
+    `name` field). Content-Type must be application/json — text/plain confuses
+    Opal's parser and causes AttributeError on iteration.
     """
     from fastapi.testclient import TestClient
     from api.index import app
@@ -133,38 +133,43 @@ def test_discovery_returns_manifest():
     response = client.get("/discovery")
 
     assert response.status_code == 200
+    assert response.headers["content-type"].startswith("application/json"), (
+        f"Content-Type must be application/json, got: {response.headers['content-type']}"
+    )
+
     data = response.json()
 
     # Root key must be 'functions', not 'tools'
-    assert "functions" in data, f"Expected root key 'functions', got: {list(data.keys())}"
-    assert "tools" not in data, "Root key 'tools' is rejected by Opal validator"
+    assert "functions" in data
+    assert "tools" not in data
     assert len(data["functions"]) == 1
 
     fn = data["functions"][0]
     assert fn["name"] == "fetch_reviews"
     assert fn["endpoint"] == "/fetch_reviews"
     assert fn["method"] == "POST"
-    assert len(fn["description"]) > 10, "Opal validator requires meaningful description length"
+    assert len(fn["description"]) > 10
 
-    # parameters must be a dict (keyed object), not a list
-    assert isinstance(fn["parameters"], dict), (
-        f"parameters must be a keyed object, got {type(fn['parameters']).__name__}"
+    # parameters must be a LIST of objects, not a dict
+    assert isinstance(fn["parameters"], list), (
+        f"parameters must be an array, got {type(fn['parameters']).__name__} — "
+        f"keyed dict triggers AttributeError in Opal's parser"
     )
 
-    expected_params = {"brand", "sources", "limit_per_source", "time_window_days"}
-    assert set(fn["parameters"].keys()) == expected_params
+    # Each parameter must have its own name, type, description, required
+    param_names = {p["name"] for p in fn["parameters"]}
+    assert param_names == {"brand", "sources", "limit_per_source", "time_window_days"}
 
-    # brand is the only required parameter
-    required = {k for k, v in fn["parameters"].items() if v.get("required")}
-    assert required == {"brand"}
+    required_params = {p["name"] for p in fn["parameters"] if p.get("required")}
+    assert required_params == {"brand"}
 
-    # All types must be valid Opal types
     valid_types = {"string", "number", "boolean", "array", "object"}
-    for name, param in fn["parameters"].items():
-        assert param["type"] in valid_types, f"Invalid type for {name}: {param['type']}"
-        assert len(param["description"]) > 10, (
-            f"Parameter '{name}' description too short — validator may reject"
-        )
+    for p in fn["parameters"]:
+        assert "name" in p
+        assert "type" in p
+        assert "description" in p
+        assert p["type"] in valid_types
+        assert len(p["description"]) > 10
 
 
 if __name__ == "__main__":

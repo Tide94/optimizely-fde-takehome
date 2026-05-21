@@ -9,6 +9,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 
 # Ensure project root is on sys.path for lib imports (local + Vercel).
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -74,9 +75,13 @@ def health() -> dict[str, str]:
         "service exposes. Called by Opal during tool registry setup. "
         "Not consumed by humans — see /openapi.json for OpenAPI 3.1 instead."
     ),
+    response_class=JSONResponse,
 )
-async def discovery() -> dict:
-    return get_manifest()
+async def discovery() -> JSONResponse:
+    return JSONResponse(
+        content=get_manifest(),
+        media_type="application/json",
+    )
 
 
 @app.post(
