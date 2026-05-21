@@ -1,0 +1,80 @@
+{
+  "brand_entity": {
+    "name": "Pliability",
+    "one_line": "Pliability is a mobility and recovery app that offers guided stretching and recovery programs tailored for athletes and fitness enthusiasts.",
+    "category": "Mobility & Recovery App",
+    "competitors": [
+      "GOWOD",
+      "The Ready State",
+      "Stay Flexy"
+    ],
+    "relevance_keywords": [
+      "mobility routines",
+      "guided stretching",
+      "breathwork",
+      "ROMWOD",
+      "personalized mobility",
+      "recovery app"
+    ],
+    "exclusion_signals": [
+      "scar pliability",
+      "mental pliability",
+      "pliability of the",
+      "pliability score"
+    ]
+  },
+  "filtered_signals": [
+    {
+      "source": "reddit",
+      "url": "https://www.reddit.com/r/hundeschule/comments/1t6hnsy/yogaapp_für_hunde/",
+      "title": "Yoga-App für Hunde",
+      "date": "2026-05-07T17:39:36Z",
+      "author_meta": "u/Primary-Lemon-2217 · r/hundeschule",
+      "rating": null,
+      "score": 0,
+      "relevance": "high",
+      "relevance_reason": "The user discusses their daily 2-year habit using Pliability, highlighting features like program customization and ease of use.",
+      "verbatim_quotes": [
+        "täglichen Dehnübungen (die ich 10-15 Minuten jeden Tag mit der App \"Pliability\" mache)",
+        "Bei Pliability erstellt man selbst sein Programm.",
+        "Was ich an der App gut finde (und warum ich sie seit fast 2 Jahren fast jeden Tag nutze) ist, dass ich jeden Morgen einfach \"Play\" drücke und es losgeht."
+      ]
+    },
+    {
+      "source": "reddit",
+      "url": "https://www.reddit.com/r/flexibility/comments/1reanga/pliability_alternative/",
+      "title": "Pliability Alternative",
+      "date": "2026-02-25T11:24:11Z",
+      "author_meta": "u/ComicBookPosterBoy · r/flexibility",
+      "rating": null,
+      "score": 0,
+      "relevance": "high",
+      "relevance_reason": "The user provides a detailed list of features they love about the app, including the library search, UI, and breath-focused routines.",
+      "verbatim_quotes": [
+        "I absolutely love Pliability, but I can't afford it right now.",
+        "I appreciate alot of the things I love about it (library, search by body part/goal, personalised plans, nice UI, etc)",
+        "positive, breath focused, calming, varied, guided routines that run 15-30 minutes each that I got from Pliability."
+      ]
+    }
+  ],
+  "run_stats": {
+    "brand": "Pliability App",
+    "focus_area": null,
+    "time_window_days": 90,
+    "raw_fetched": 5,
+    "kept_high": 2,
+    "kept_low_focus": 0,
+    "dropped": 3,
+    "drop_reasons": {
+      "off_topic_entity_mismatch": 3,
+      "off_topic_focus_mismatch": 0,
+      "other": 0
+    },
+    "sources_succeeded": [
+      "reddit"
+    ],
+    "sources_failed": [
+      "g2"
+    ]
+  }
+}
