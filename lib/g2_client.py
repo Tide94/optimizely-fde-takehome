@@ -32,6 +32,8 @@ def _scrapingbee_get(
 
     Uses premium proxy by default; opt into the more expensive stealth proxy
     when the target page applies aggressive bot detection (G2 reviews pages).
+    Retries once on 5xx — ScrapingBee documents these as 'not charged, try
+    again' and they happen at peak load.
     """
     params: dict[str, str] = {
         "api_key": api_key,
@@ -44,9 +46,20 @@ def _scrapingbee_get(
     else:
         params["premium_proxy"] = "true"
 
-    response = requests.get(SCRAPINGBEE_URL, params=params, timeout=timeout)
-    response.raise_for_status()
-    return response.text
+    last_exc: HTTPError | None = None
+    for attempt in (1, 2):
+        try:
+            response = requests.get(SCRAPINGBEE_URL, params=params, timeout=timeout)
+            response.raise_for_status()
+            return response.text
+        except HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else None
+            if status is not None and 500 <= status < 600 and attempt == 1:
+                logger.warning("ScrapingBee %s on attempt %d, retrying", status, attempt)
+                last_exc = exc
+                continue
+            raise
+    raise last_exc  # type: ignore[misc]
 
 
 def fetch_g2_reviews(

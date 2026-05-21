@@ -23,13 +23,17 @@ logger = logging.getLogger(__name__)
 REDDIT_BASE = "https://www.reddit.com"
 SUBREDDITS = ["all", "marketing", "SaaS", "Entrepreneur"]
 TOP_COMMENTS = 2
-# Reddit's public JSON API is sensitive to UA strings; bot-shaped UAs from
-# data-center IPs (e.g. Vercel/AWS) silently get throttled to empty results.
-# A descriptive UA naming the project + contact tends to fare better.
 DEFAULT_USER_AGENT = (
     "voc-review-fetcher/0.1 (FDE take-home; contact: teddybanjo123@gmail.com)"
 )
 REQUEST_TIMEOUT = 15
+
+# Reddit's public JSON API silently throttles requests from datacenter IP
+# ranges (AWS/Vercel) — returns 200 with empty children arrays. When
+# SCRAPINGBEE_API_KEY is set we proxy through it, which costs ~1 credit
+# (~$0.001) per request but bypasses the throttling. This is enabled by
+# default in production; opt out by setting REDDIT_VIA_SCRAPINGBEE=false.
+SCRAPINGBEE_URL = "https://app.scrapingbee.com/api/v1/"
 
 
 def _user_agent() -> str:
@@ -57,16 +61,60 @@ def _utc_iso_from_utc(timestamp: float) -> str:
     )
 
 
+def _should_use_scrapingbee() -> bool:
+    """Whether to proxy Reddit calls through ScrapingBee."""
+    if os.getenv("REDDIT_VIA_SCRAPINGBEE", "true").lower() in ("false", "0", "no"):
+        return False
+    return bool(os.getenv("SCRAPINGBEE_API_KEY"))
+
+
+# ScrapingBee charges 1 credit (~$0.001) per call without JS render.
+SCRAPINGBEE_COST_PER_REDDIT_CALL = 0.001
+
+# Module-level counter to attribute Reddit-via-ScrapingBee cost back to the
+# orchestrator. Reset at the start of every fetch_reddit_reviews invocation.
+_reddit_sb_calls = 0
+
+
 def _get_json(url: str, params: dict[str, str | int]) -> dict[str, Any]:
-    """GET a Reddit JSON endpoint with the project User-Agent."""
-    response = requests.get(
-        url,
-        params=params,
-        headers={"User-Agent": _user_agent()},
-        timeout=REQUEST_TIMEOUT,
-    )
-    response.raise_for_status()
-    return response.json()
+    """GET a Reddit JSON endpoint, optionally proxying through ScrapingBee.
+
+    Retries once on ScrapingBee 5xx (their proxy is flaky at peak load).
+    """
+    global _reddit_sb_calls
+    use_sb = _should_use_scrapingbee()
+    last_exc: HTTPError | None = None
+
+    for attempt in (1, 2):
+        try:
+            if use_sb:
+                from urllib.parse import urlencode
+
+                target_url = f"{url}?{urlencode(params)}"
+                sb_params = {
+                    "api_key": os.getenv("SCRAPINGBEE_API_KEY", ""),
+                    "url": target_url,
+                    "render_js": "false",
+                }
+                response = requests.get(SCRAPINGBEE_URL, params=sb_params, timeout=30)
+                _reddit_sb_calls += 1
+            else:
+                response = requests.get(
+                    url,
+                    params=params,
+                    headers={"User-Agent": _user_agent()},
+                    timeout=REQUEST_TIMEOUT,
+                )
+            response.raise_for_status()
+            return response.json()
+        except HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else None
+            if status is not None and 500 <= status < 600 and attempt == 1:
+                logger.warning("Reddit fetch %s on attempt %d, retrying", status, attempt)
+                last_exc = exc
+                continue
+            raise
+    raise last_exc  # type: ignore[misc]
 
 
 def _search_subreddit(
@@ -159,8 +207,11 @@ def fetch_reddit_reviews(
 
     Returns:
         Tuple of (reviews, failure_reason, estimated_cost_usd).
-        failure_reason is None on success. Cost is always 0 (free public API).
+        failure_reason is None on success. Cost is 0 when calling Reddit
+        directly; ~$0.001 per HTTP request when proxying via ScrapingBee.
     """
+    global _reddit_sb_calls
+    _reddit_sb_calls = 0
     cutoff = datetime.now(timezone.utc) - timedelta(days=time_window_days)
     time_filter = _time_filter_for_window(time_window_days)
     seen_ids: set[str] = set()
@@ -206,10 +257,11 @@ def fetch_reddit_reviews(
         if not reviews:
             return [], f"reddit: {exc}", 0.0
 
+    cost = _reddit_sb_calls * SCRAPINGBEE_COST_PER_REDDIT_CALL
     if not reviews:
-        return [], "reddit: no results found", 0.0
+        return [], "reddit: no results found", cost
 
-    return sort_reviews_by_date_desc(reviews), None, 0.0
+    return sort_reviews_by_date_desc(reviews), None, cost
 
 
 def _quote(value: str) -> str:
