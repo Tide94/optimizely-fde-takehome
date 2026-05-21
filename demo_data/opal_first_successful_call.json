@@ -1,0 +1,38 @@
+{
+  "response": {
+    "brand": "Optimizely",
+    "fetched_at": "2026-05-21T23:06:29Z",
+    "reviews": [
+      {
+        "author_meta": "u/Federal767 · r/meme",
+        "body": "Bro optimized everything except parenthood\n\n\n\n--- Comments ---\n\n\nSorry, son, we're going to have to let you go. We're just not seeing the numbers your mother and I expected when we brought you on in this role. \n\nHe probably did something shady between 21:30 and 22:30, 🤨📸",
+        "date": "2026-04-09T10:43:51Z",
+        "rating": null,
+        "score": 102019,
+        "source": "reddit",
+        "title": "Bro optimized everything except parenthood",
+        "url": "https://www.reddit.com/r/meme/comments/1sgm2k6/bro_optimized_everything_except_parenthood/"
+      },
+      {
+        "author_meta": "u/Shirudigi · r/GoogleAdsDiscussion",
+        "body": "Optimizely or other LP testing tool?\n\nFor landing page testing, do you prefer Optimizely to track results or another tool and why?\n\n\n\n--- Comments ---\n\n\nI hate to be that guy but I built FoundryCRO as the next generation of these types of tools. Its tailored specifically for testing against ad campaigns and you can run multiple campaigns on one landing page.\n\n If you are in the market for these types of tools I'd love to get your feedback on what resonates the most for you when your doing research and comparing. I'd be happy to hand out free trials, show some demos, or answer any questions\n\nTruConversion has been great for me so far.",
+        "date": "2026-04-04T13:45:11Z",
+        "rating": null,
+        "score": 3,
+        "source": "reddit",
+        "title": "Optimizely or other LP testing tool?",
+        "url": "https://www.reddit.com/r/GoogleAdsDiscussion/comments/1sc9n5h/optimizely_or_other_lp_testing_tool/"
+      }
+    ],
+    "stats": {
+      "estimated_cost_usd": 0.004,
+      "latency_ms": 15767,
+      "sources_failed": [],
+      "sources_succeeded": [
+        "reddit"
+      ],
+      "total_fetched": 2
+    }
+  },
+  "response_type": "application/json"
+}
