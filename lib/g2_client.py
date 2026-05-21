@@ -26,7 +26,7 @@ G2_BASE = "https://www.g2.com"
 
 
 def _scrapingbee_get(
-    api_key: str, url: str, stealth: bool = False, timeout: int = 60
+    api_key: str, url: str, stealth: bool = False, timeout: int = 120
 ) -> str:
     """Fetch a URL through ScrapingBee with JS rendering.
 

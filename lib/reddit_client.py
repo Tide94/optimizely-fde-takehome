@@ -23,7 +23,12 @@ logger = logging.getLogger(__name__)
 REDDIT_BASE = "https://www.reddit.com"
 SUBREDDITS = ["all", "marketing", "SaaS", "Entrepreneur"]
 TOP_COMMENTS = 2
-DEFAULT_USER_AGENT = "voc_review_fetcher/0.1.0 (Optimizely FDE take-home demo)"
+# Reddit's public JSON API is sensitive to UA strings; bot-shaped UAs from
+# data-center IPs (e.g. Vercel/AWS) silently get throttled to empty results.
+# A descriptive UA naming the project + contact tends to fare better.
+DEFAULT_USER_AGENT = (
+    "voc-review-fetcher/0.1 (FDE take-home; contact: teddybanjo123@gmail.com)"
+)
 REQUEST_TIMEOUT = 15
 
 
@@ -78,6 +83,13 @@ def _search_subreddit(
     }
     payload = _get_json(url, params)
     children = payload.get("data", {}).get("children", [])
+    if not children:
+        # Log payload shape so we can tell rate-limit responses from real empties.
+        logger.warning(
+            "r/%s search returned 0 children; payload keys=%s",
+            subreddit,
+            list(payload.keys()) if isinstance(payload, dict) else type(payload).__name__,
+        )
     return [child["data"] for child in children if child.get("data")]
 
 
