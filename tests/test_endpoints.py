@@ -120,7 +120,12 @@ class TestFetchReviewsEndpoint(unittest.TestCase):
 
 
 def test_discovery_returns_manifest():
-    """The discovery endpoint must return Opal's expected manifest shape."""
+    """The discovery endpoint must return Opal's validator-enforced schema.
+
+    Opal validator requires root key 'functions' (not 'tools') and parameters
+    as a keyed object (not array). Confirmed empirically — the docs describe
+    a different shape than the validator enforces.
+    """
     from fastapi.testclient import TestClient
     from api.index import app
 
@@ -129,26 +134,37 @@ def test_discovery_returns_manifest():
 
     assert response.status_code == 200
     data = response.json()
-    assert "tools" in data
-    assert len(data["tools"]) == 1
 
-    tool = data["tools"][0]
-    assert tool["name"] == "fetch_reviews"
-    assert tool["endpoint"] == "/fetch_reviews"
-    assert tool["method"] == "POST"
-    assert isinstance(tool["parameters"], list)
+    # Root key must be 'functions', not 'tools'
+    assert "functions" in data, f"Expected root key 'functions', got: {list(data.keys())}"
+    assert "tools" not in data, "Root key 'tools' is rejected by Opal validator"
+    assert len(data["functions"]) == 1
 
-    param_names = {p["name"] for p in tool["parameters"]}
-    assert param_names == {"brand", "sources", "limit_per_source", "time_window_days"}
+    fn = data["functions"][0]
+    assert fn["name"] == "fetch_reviews"
+    assert fn["endpoint"] == "/fetch_reviews"
+    assert fn["method"] == "POST"
+    assert len(fn["description"]) > 10, "Opal validator requires meaningful description length"
+
+    # parameters must be a dict (keyed object), not a list
+    assert isinstance(fn["parameters"], dict), (
+        f"parameters must be a keyed object, got {type(fn['parameters']).__name__}"
+    )
+
+    expected_params = {"brand", "sources", "limit_per_source", "time_window_days"}
+    assert set(fn["parameters"].keys()) == expected_params
 
     # brand is the only required parameter
-    required_params = {p["name"] for p in tool["parameters"] if p["required"]}
-    assert required_params == {"brand"}
+    required = {k for k, v in fn["parameters"].items() if v.get("required")}
+    assert required == {"brand"}
 
-    # All parameter types must be valid Opal types
+    # All types must be valid Opal types
     valid_types = {"string", "number", "boolean", "array", "object"}
-    for p in tool["parameters"]:
-        assert p["type"] in valid_types, f"Invalid type for {p['name']}: {p['type']}"
+    for name, param in fn["parameters"].items():
+        assert param["type"] in valid_types, f"Invalid type for {name}: {param['type']}"
+        assert len(param["description"]) > 10, (
+            f"Parameter '{name}' description too short — validator may reject"
+        )
 
 
 if __name__ == "__main__":
