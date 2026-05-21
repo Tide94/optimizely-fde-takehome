@@ -1,0 +1,121 @@
+# voc_review_fetcher
+
+Opal custom tool that fetches public customer reviews and discussions about a brand from Reddit and G2, normalizes them into a single JSON schema, and returns structured Voice-of-Customer data for marketing teams. Opal’s built-in `browse_web` tool struggles with JS-rendered review sites and paginated Reddit threads — this tool fills that gap.
+
+Built for the Optimizely Forward Deployed Engineer take-home interview; demonstrates Opal custom tool integration.
+
+## Quickstart
+
+### Environment variables
+
+Copy `.env.example` to `.env` and fill in:
+
+| Variable | Required for | Description |
+|----------|--------------|-------------|
+| `REDDIT_USER_AGENT` | Reddit (optional) | Identifier for the public JSON API, e.g. `voc_review_fetcher/0.1.0 by u/yourusername`. A sensible default is used if unset. |
+| `SCRAPINGBEE_API_KEY` | G2 | From [scrapingbee.com](https://www.scrapingbee.com) — free tier = 1000 credits, no card required |
+
+Reddit uses the **unauthenticated public JSON API** (no OAuth client needed —
+this avoids Reddit's developer-ticket queue, which now gates all new apps).
+G2 is skipped gracefully if `SCRAPINGBEE_API_KEY` is missing.
+
+### Local run
+
+Runs on Python 3.9+ locally; `runtime.txt` pins Vercel to 3.11.
+
+```bash
+cd optimizely-fde-takehome
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn api.index:app --reload
+```
+
+### Test endpoints
+
+```bash
+# Health
+curl http://127.0.0.1:8000/health
+
+# All sources (default)
+curl -X POST http://127.0.0.1:8000/fetch_reviews \
+  -H "Content-Type: application/json" \
+  -d '{"brand":"Optimizely","limit_per_source":10}'
+
+# Reddit only
+curl -X POST http://127.0.0.1:8000/fetch_reviews \
+  -H "Content-Type: application/json" \
+  -d '{"brand":"Optimizely","sources":["reddit"],"limit_per_source":5,"time_window_days":90}'
+
+# G2 only
+curl -X POST http://127.0.0.1:8000/fetch_reviews \
+  -H "Content-Type: application/json" \
+  -d '{"brand":"Optimizely","sources":["g2"],"limit_per_source":5}'
+```
+
+### Run tests
+
+```bash
+python -m unittest tests.test_endpoints
+```
+
+## Deploy to Vercel
+
+`vercel.json` requests `maxDuration: 60` (Vercel Hobby tier maximum). The
+Reddit branch finishes in ~2 s; G2 can take 60–90 s because the ScrapingBee
+stealth proxy required by G2's anti-bot defenses is slow. If you need
+guaranteed G2 success in production, upgrade to Pro (`maxDuration: 300`)
+or call with `sources: ["reddit"]` for the fast path.
+
+```bash
+cd optimizely-fde-takehome
+npm i -g vercel   # if needed
+vercel login
+vercel link       # first time only
+vercel env add REDDIT_USER_AGENT      # optional
+vercel env add SCRAPINGBEE_API_KEY    # required for G2
+vercel --prod
+```
+
+After deploy, replace the host in the example below:
+
+```bash
+curl https://YOUR-PROJECT.vercel.app/health
+
+# Fast Reddit-only path (~2s):
+curl -X POST https://YOUR-PROJECT.vercel.app/fetch_reviews \
+  -H "Content-Type: application/json" \
+  -d '{"brand":"Optimizely","sources":["reddit"],"limit_per_source":10}'
+
+# Combined (may exceed 60s on Hobby tier):
+curl -X POST https://YOUR-PROJECT.vercel.app/fetch_reviews \
+  -H "Content-Type: application/json" \
+  -d '{"brand":"Optimizely","sources":["reddit","g2"],"limit_per_source":5}'
+```
+
+## Cost
+
+- **Reddit:** $0 — public JSON API, no auth.
+- **G2:** ~$0.10 per brand fetch (1× ScrapingBee premium proxy for search +
+  1× stealth proxy for reviews page; 100 credits total at the $0.001/credit
+  baseline). Reported in `stats.estimated_cost_usd` on every response.
+
+## API
+
+- `GET /health` — `{"status":"ok","version":"0.1.0"}`
+- `POST /fetch_reviews` — see request/response schema in project spec
+
+## Project layout
+
+```
+optimizely-fde-takehome/
+├── api/index.py          # FastAPI app (Vercel entry)
+├── lib/
+│   ├── models.py         # Pydantic schemas
+│   ├── reddit_client.py  # Public Reddit JSON API
+│   ├── g2_client.py      # ScrapingBee HTTP + cost accounting
+│   └── g2_parser.py      # BeautifulSoup parsing for G2 microdata
+├── tests/test_endpoints.py
+├── requirements.txt
+└── vercel.json
+```
