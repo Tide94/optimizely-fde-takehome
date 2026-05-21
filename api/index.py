@@ -17,6 +17,7 @@ if str(_PROJECT_ROOT) not in sys.path:
 
 load_dotenv(_PROJECT_ROOT / ".env")
 
+from lib.discovery import get_manifest
 from lib.g2_client import fetch_g2_reviews
 from lib.models import (
     FetchReviewsRequest,
@@ -62,6 +63,20 @@ app = FastAPI(
 def health() -> dict[str, str]:
     """Health check endpoint for monitoring and deploy verification."""
     return {"status": "ok", "version": APP_VERSION}
+
+
+@app.get(
+    "/discovery",
+    operation_id="discovery",
+    summary="Opal tool manifest",
+    description=(
+        "Returns the Optimizely Opal tool manifest describing the tools this "
+        "service exposes. Called by Opal during tool registry setup. "
+        "Not consumed by humans — see /openapi.json for OpenAPI 3.1 instead."
+    ),
+)
+async def discovery() -> dict:
+    return get_manifest()
 
 
 @app.post(

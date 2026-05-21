@@ -119,5 +119,37 @@ class TestFetchReviewsEndpoint(unittest.TestCase):
         self.assertEqual(response.reviews[0].source, "reddit")
 
 
+def test_discovery_returns_manifest():
+    """The discovery endpoint must return Opal's expected manifest shape."""
+    from fastapi.testclient import TestClient
+    from api.index import app
+
+    client = TestClient(app)
+    response = client.get("/discovery")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "tools" in data
+    assert len(data["tools"]) == 1
+
+    tool = data["tools"][0]
+    assert tool["name"] == "fetch_reviews"
+    assert tool["endpoint"] == "/fetch_reviews"
+    assert tool["method"] == "POST"
+    assert isinstance(tool["parameters"], list)
+
+    param_names = {p["name"] for p in tool["parameters"]}
+    assert param_names == {"brand", "sources", "limit_per_source", "time_window_days"}
+
+    # brand is the only required parameter
+    required_params = {p["name"] for p in tool["parameters"] if p["required"]}
+    assert required_params == {"brand"}
+
+    # All parameter types must be valid Opal types
+    valid_types = {"string", "number", "boolean", "array", "object"}
+    for p in tool["parameters"]:
+        assert p["type"] in valid_types, f"Invalid type for {p['name']}: {p['type']}"
+
+
 if __name__ == "__main__":
     unittest.main()
