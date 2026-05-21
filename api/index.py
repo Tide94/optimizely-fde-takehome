@@ -34,16 +34,50 @@ logger = logging.getLogger(__name__)
 
 APP_VERSION = "0.1.0"
 
-app = FastAPI(title="voc_review_fetcher", version=APP_VERSION)
+app = FastAPI(
+    title="voc_review_fetcher",
+    description=(
+        "Fetches public customer reviews and discussions about a brand from "
+        "Reddit and G2. Use this when an agent needs real customer language, "
+        "sentiment, or feedback about a product or company. Returns structured "
+        "reviews with verbatim text, source URLs, ratings, dates, and aggregate "
+        "stats (cost, latency, source success)."
+    ),
+    version=APP_VERSION,
+    servers=[
+        {
+            "url": "https://optimizely-fde-takehome-git-main-trilllabs.vercel.app",
+            "description": "Production (Vercel)",
+        }
+    ],
+)
 
 
-@app.get("/health")
+@app.get(
+    "/health",
+    operation_id="health",
+    summary="Health check",
+    description="Returns service status and version. Use to verify the tool is reachable.",
+)
 def health() -> dict[str, str]:
     """Health check endpoint for monitoring and deploy verification."""
     return {"status": "ok", "version": APP_VERSION}
 
 
-@app.post("/fetch_reviews", response_model=FetchReviewsResponse)
+@app.post(
+    "/fetch_reviews",
+    response_model=FetchReviewsResponse,
+    operation_id="fetch_reviews",
+    summary="Fetch customer reviews for a brand",
+    description=(
+        "Fetch public customer reviews and discussions about a brand from "
+        "Reddit and G2. Returns up to limit_per_source items per source, "
+        "filtered to the last time_window_days. Continues gracefully if "
+        "individual sources fail (reports them in stats.sources_failed). "
+        "Typical latency: 30s (Reddit only), 90s (G2 only), 100s (both). "
+        "Typical cost: $0.01 (Reddit only) to $0.11 (both sources, full limits)."
+    ),
+)
 def fetch_reviews(req: FetchReviewsRequest) -> FetchReviewsResponse:
     """
     Fetch public customer reviews and discussions for a brand.
