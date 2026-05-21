@@ -6,10 +6,12 @@ import logging
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import Body, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 
 # Ensure project root is on sys.path for lib imports (local + Vercel).
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -23,6 +25,7 @@ from lib.g2_client import fetch_g2_reviews
 from lib.models import (
     FetchReviewsRequest,
     FetchReviewsResponse,
+    OpalEnvelope,
     Review,
     SourceType,
     Stats,
@@ -84,25 +87,17 @@ async def discovery() -> JSONResponse:
     )
 
 
-@app.post(
-    "/fetch_reviews",
-    response_model=FetchReviewsResponse,
-    operation_id="fetch_reviews",
-    summary="Fetch customer reviews for a brand",
-    description=(
-        "Fetch public customer reviews and discussions about a brand from "
-        "Reddit and G2. Returns up to limit_per_source items per source, "
-        "filtered to the last time_window_days. Continues gracefully if "
-        "individual sources fail (reports them in stats.sources_failed). "
-        "Typical latency: 30s (Reddit only), 90s (G2 only), 100s (both). "
-        "Typical cost: $0.01 (Reddit only) to $0.11 (both sources, full limits)."
-    ),
-)
-def fetch_reviews(req: FetchReviewsRequest) -> FetchReviewsResponse:
+async def _execute_fetch_reviews(req: FetchReviewsRequest) -> FetchReviewsResponse:
     """
     Fetch public customer reviews and discussions for a brand.
 
     Aggregates results from Reddit and G2, continuing when individual sources fail.
+
+    Note: this coroutine performs blocking HTTP calls (via `fetch_reddit_reviews`
+    and `fetch_g2_reviews`, which use `requests`). On Vercel's single-request-
+    per-instance Hobby tier this is fine; on a multi-tenant deployment, swap
+    those clients to an async HTTP library (e.g. httpx.AsyncClient) so the
+    event loop isn't blocked for 30-100s per request.
     """
     brand = req.brand
     start = time.perf_counter()
@@ -158,3 +153,44 @@ def fetch_reviews(req: FetchReviewsRequest) -> FetchReviewsResponse:
             estimated_cost_usd=round(estimated_cost_usd, 6),
         ),
     )
+
+
+@app.post(
+    "/fetch_reviews",
+    response_model=FetchReviewsResponse,
+    operation_id="fetch_reviews",
+    summary="Fetch customer reviews for a brand",
+    description=(
+        "Fetch public customer reviews and discussions about a brand from "
+        "Reddit and G2. Accepts EITHER Opal's envelope shape "
+        "({\"parameters\": {...}, \"environment\": {...}, \"chat_metadata\": "
+        "{...}}) OR a flat body matching FetchReviewsRequest. Returns up to "
+        "limit_per_source items per source. Continues gracefully if "
+        "individual sources fail. Typical latency: 30s (Reddit), 90s (G2), "
+        "100s (both). Typical cost: $0.01-$0.11 per call."
+    ),
+)
+async def fetch_reviews(payload: dict[str, Any] = Body(...)) -> FetchReviewsResponse:
+    """Accept Opal's envelope or a flat body, then delegate to the shared executor."""
+    # Detect envelope vs flat body
+    if "parameters" in payload and isinstance(payload["parameters"], dict):
+        env = OpalEnvelope(**payload)
+        params = env.parameters
+        thread_id = (env.chat_metadata or {}).get("thread_id")
+        exec_mode = (env.environment or {}).get("execution_mode")
+        if thread_id or exec_mode:
+            logger.info(
+                "fetch_reviews called via Opal envelope (thread_id=%s, mode=%s)",
+                thread_id,
+                exec_mode,
+            )
+    else:
+        # Flat body — direct curl, local testing, or pre-envelope callers
+        params = payload
+
+    try:
+        req = FetchReviewsRequest(**params)
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=e.errors()) from e
+
+    return await _execute_fetch_reviews(req)

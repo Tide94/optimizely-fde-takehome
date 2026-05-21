@@ -1,5 +1,6 @@
 """Smoke tests for voc_review_fetcher API endpoints."""
 
+import asyncio
 import sys
 import unittest
 from pathlib import Path
@@ -9,7 +10,7 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
-from api.index import app, fetch_reviews, health  # noqa: E402
+from api.index import _execute_fetch_reviews, app, health  # noqa: E402
 from lib.models import FetchReviewsRequest, Review  # noqa: E402
 
 SAMPLE_REDDIT_REVIEW = Review(
@@ -63,8 +64,10 @@ class TestFetchReviewsEndpoint(unittest.TestCase):
         mock_reddit.return_value = ([SAMPLE_REDDIT_REVIEW], None, 0.0)
         mock_g2.return_value = ([SAMPLE_G2_REVIEW], None, 0.002)
 
-        response = fetch_reviews(
-            FetchReviewsRequest(brand="Optimizely", sources=["reddit", "g2"], limit_per_source=5)
+        response = asyncio.run(
+            _execute_fetch_reviews(
+                FetchReviewsRequest(brand="Optimizely", sources=["reddit", "g2"], limit_per_source=5)
+            )
         )
 
         self.assertEqual(response.brand, "Optimizely")
@@ -82,8 +85,10 @@ class TestFetchReviewsEndpoint(unittest.TestCase):
         mock_reddit.return_value = ([SAMPLE_REDDIT_REVIEW], None, 0.0)
         mock_g2.return_value = ([], "g2: SCRAPINGBEE_API_KEY not set", 0.0)
 
-        response = fetch_reviews(
-            FetchReviewsRequest(brand="Optimizely", sources=["reddit", "g2"])
+        response = asyncio.run(
+            _execute_fetch_reviews(
+                FetchReviewsRequest(brand="Optimizely", sources=["reddit", "g2"])
+            )
         )
 
         self.assertEqual(len(response.reviews), 1)
@@ -99,8 +104,10 @@ class TestFetchReviewsEndpoint(unittest.TestCase):
         mock_reddit.return_value = ([], "reddit: missing credentials", 0.0)
         mock_g2.return_value = ([], "g2: SCRAPINGBEE_API_KEY not set", 0.0)
 
-        response = fetch_reviews(
-            FetchReviewsRequest(brand="Optimizely", sources=["reddit", "g2"])
+        response = asyncio.run(
+            _execute_fetch_reviews(
+                FetchReviewsRequest(brand="Optimizely", sources=["reddit", "g2"])
+            )
         )
 
         self.assertEqual(response.reviews, [])
@@ -111,8 +118,10 @@ class TestFetchReviewsEndpoint(unittest.TestCase):
     def test_reddit_only_source(self, mock_reddit: unittest.mock.MagicMock) -> None:
         mock_reddit.return_value = ([SAMPLE_REDDIT_REVIEW], None, 0.0)
 
-        response = fetch_reviews(
-            FetchReviewsRequest(brand="Optimizely", sources=["reddit"])
+        response = asyncio.run(
+            _execute_fetch_reviews(
+                FetchReviewsRequest(brand="Optimizely", sources=["reddit"])
+            )
         )
 
         self.assertEqual(len(response.reviews), 1)
@@ -170,6 +179,99 @@ def test_discovery_returns_manifest():
         assert "description" in p
         assert p["type"] in valid_types
         assert len(p["description"]) > 10
+
+
+def test_fetch_reviews_accepts_opal_envelope(monkeypatch):
+    """The handler must unwrap Opal's envelope shape correctly."""
+    from fastapi.testclient import TestClient
+    from api.index import app
+
+    # Patch the actual fetcher so the test doesn't hit Reddit/G2
+    async def fake_execute(req):
+        from lib.models import FetchReviewsResponse, Stats
+        return FetchReviewsResponse(
+            brand=req.brand,
+            fetched_at="2026-05-21T00:00:00Z",
+            reviews=[],
+            stats=Stats(
+                total_fetched=0,
+                sources_succeeded=[],
+                sources_failed=[],
+                latency_ms=0,
+                estimated_cost_usd=0.0,
+            ),
+        )
+
+    monkeypatch.setattr("api.index._execute_fetch_reviews", fake_execute)
+
+    client = TestClient(app)
+    response = client.post(
+        "/fetch_reviews",
+        json={
+            "parameters": {
+                "brand": "Optimizely",
+                "sources": ["reddit"],
+                "limit_per_source": 2,
+                "time_window_days": 90,
+            },
+            "environment": {"execution_mode": "interactive"},
+            "chat_metadata": {"thread_id": "abc-123"},
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["brand"] == "Optimizely"
+
+
+def test_fetch_reviews_accepts_flat_body(monkeypatch):
+    """The handler must still accept a flat body for direct/local use."""
+    from fastapi.testclient import TestClient
+    from api.index import app
+
+    async def fake_execute(req):
+        from lib.models import FetchReviewsResponse, Stats
+        return FetchReviewsResponse(
+            brand=req.brand,
+            fetched_at="2026-05-21T00:00:00Z",
+            reviews=[],
+            stats=Stats(
+                total_fetched=0,
+                sources_succeeded=[],
+                sources_failed=[],
+                latency_ms=0,
+                estimated_cost_usd=0.0,
+            ),
+        )
+
+    monkeypatch.setattr("api.index._execute_fetch_reviews", fake_execute)
+
+    client = TestClient(app)
+    response = client.post(
+        "/fetch_reviews",
+        json={
+            "brand": "Optimizely",
+            "sources": ["reddit"],
+            "limit_per_source": 2,
+            "time_window_days": 90,
+        },
+    )
+
+    assert response.status_code == 200
+
+
+def test_fetch_reviews_rejects_invalid_inner_params():
+    """If the inner params fail validation, return 422 with field details."""
+    from fastapi.testclient import TestClient
+    from api.index import app
+
+    client = TestClient(app)
+    # Envelope-shaped but missing required `brand`
+    response = client.post(
+        "/fetch_reviews",
+        json={"parameters": {"sources": ["reddit"]}},
+    )
+    assert response.status_code == 422
 
 
 if __name__ == "__main__":

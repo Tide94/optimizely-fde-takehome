@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -107,3 +107,33 @@ def parse_date_for_sort(date_str: str) -> datetime:
 def sort_reviews_by_date_desc(reviews: list[Review]) -> list[Review]:
     """Sort reviews by date descending (newest first)."""
     return sorted(reviews, key=lambda r: parse_date_for_sort(r.date), reverse=True)
+
+
+class OpalEnvelope(BaseModel):
+    """Opal's tool invocation envelope.
+
+    Opal wraps tool parameters under a 'parameters' key and includes optional
+    runtime metadata (environment, chat_metadata). The envelope shape was
+    discovered empirically from a 422 response — Opal's docs do not describe
+    the exact wire format.
+
+    For backwards compatibility the /fetch_reviews route accepts either:
+      - The Opal-shaped envelope: {"parameters": {...}, "environment": {...}}
+      - A flat FetchReviewsRequest body: {"brand": "...", "sources": [...]}
+
+    This is handled in the route by attempting envelope parse first, then
+    falling back to flat-body parse.
+    """
+
+    parameters: dict[str, Any] = Field(
+        ...,
+        description="The actual tool parameters (matches FetchReviewsRequest shape).",
+    )
+    environment: Optional[dict[str, Any]] = Field(
+        default=None,
+        description="Opal-provided runtime metadata (e.g., execution_mode).",
+    )
+    chat_metadata: Optional[dict[str, Any]] = Field(
+        default=None,
+        description="Opal-provided chat context (e.g., thread_id) for traceability.",
+    )
