@@ -1,0 +1,207 @@
+{
+  "brand_entity": {
+    "name": "Optimizely",
+    "one_line": "Optimizely is a digital experience platform that provides specialized tools for A/B testing, experimentation, content management, and B2B commerce.",
+    "category": "Digital Experience Platform (DXP)",
+    "competitors": [
+      "VWO",
+      "Adobe Target",
+      "Sitecore"
+    ],
+    "relevance_keywords": [
+      "A/B testing",
+      "experimentation platform",
+      "Configured Commerce",
+      "CMS",
+      "personalization",
+      "feature flags",
+      "Episerver",
+      "digital experience"
+    ],
+    "exclusion_signals": [
+      "optimism",
+      "game optimization",
+      "optimized setup",
+      "optimize your code",
+      "optimistic"
+    ]
+  },
+  "filtered_signals": [
+    {
+      "source": "reddit",
+      "url": "https://www.reddit.com/r/GoogleAdsDiscussion/comments/1sc9n5h/optimizely_or_other_lp_testing_tool/",
+      "title": "Optimizely or other LP testing tool?",
+      "date": "2026-04-04T13:45:11Z",
+      "author_meta": "u/Shirudigi · r/GoogleAdsDiscussion",
+      "rating": null,
+      "score": 3,
+      "relevance": "high",
+      "relevance_reason": "Directly asks for a comparison of the Optimizely platform against other landing page testing tools for tracking results.",
+      "verbatim_quotes": [
+        "For landing page testing, do you prefer Optimizely to track results or another tool and why?"
+      ]
+    },
+    {
+      "source": "g2",
+      "url": "https://www.g2.com/products/optimizely-configured-commerce",
+      "title": "\"Development friendly Commerce\"",
+      "date": "2025-07-01T00:00:00Z",
+      "author_meta": "Kevin J.",
+      "rating": 4,
+      "score": null,
+      "relevance": "high",
+      "relevance_reason": "A customer review specifically discussing the utility of the Optimizely Configured Commerce manager for product teams.",
+      "verbatim_quotes": [
+        "Built in commerce manager is a huge help for both product managers and developers"
+      ]
+    },
+    {
+      "source": "g2",
+      "url": "https://www.g2.com/products/optimizely-configured-commerce",
+      "title": "\"How Optimizely CC Transformed Our B2B (With Some Tweaks)\"",
+      "date": "2025-06-27T00:00:00Z",
+      "author_meta": "Gustavo L.",
+      "rating": 5,
+      "score": null,
+      "relevance": "high",
+      "relevance_reason": "Detailed feedback on Optimizely's capability in handling complex B2B workflows and product configurations.",
+      "verbatim_quotes": [
+        "how this platform truly understands complex B2B needs",
+        "handles our intricate product configurations and bulk ordering workflows effortlessly"
+      ]
+    },
+    {
+      "source": "g2",
+      "url": "https://www.g2.com/products/optimizely-configured-commerce",
+      "title": "\"great team of experts\"",
+      "date": "2024-04-01T00:00:00Z",
+      "author_meta": "Verified User in Apparel & Fashion",
+      "rating": 5,
+      "score": null,
+      "relevance": "high",
+      "relevance_reason": "Review confirming the comprehensiveness of features within the Optimizely platform.",
+      "verbatim_quotes": [
+        "Their platform is very comprehensive and they offer a wide array of features."
+      ]
+    },
+    {
+      "source": "g2",
+      "url": "https://www.g2.com/products/optimizely-configured-commerce",
+      "title": "\"Website design tool of great value\"",
+      "date": "2023-12-28T00:00:00Z",
+      "author_meta": "Verified User in Consulting",
+      "rating": 2,
+      "score": null,
+      "relevance": "high",
+      "relevance_reason": "Critically assesses the tool's impact on digital experience and conversion rates vs the cost of implementation.",
+      "verbatim_quotes": [
+        "Not only does It optimize the digital experience for online shoppers but also it enhances personalization with ease & improves the conversion rate."
+      ]
+    },
+    {
+      "source": "g2",
+      "url": "https://www.g2.com/products/optimizely-configured-commerce",
+      "title": "\"Best service\"",
+      "date": "2023-12-24T00:00:00Z",
+      "author_meta": "Sufiyan G.",
+      "rating": 5,
+      "score": null,
+      "relevance": "high",
+      "relevance_reason": "General customer satisfaction with the reliability and results of the Optimizely product.",
+      "verbatim_quotes": [
+        "It's a reliable product which gives you desired results."
+      ]
+    },
+    {
+      "source": "g2",
+      "url": "https://www.g2.com/products/optimizely-configured-commerce",
+      "title": "\"Review on Optimizely\"",
+      "date": "2023-12-12T00:00:00Z",
+      "author_meta": "Verified User in Marketing and Advertising",
+      "rating": 5,
+      "score": null,
+      "relevance": "high",
+      "relevance_reason": "Highlights the unified nature of the platform for content and personalization.",
+      "verbatim_quotes": [
+        "Unified platform for content management",
+        "Flexibility and scalability"
+      ]
+    },
+    {
+      "source": "g2",
+      "url": "https://www.g2.com/products/optimizely-configured-commerce",
+      "title": "\"G2, Optimizely configured support e commerce platforms with so many features\"",
+      "date": "2023-12-07T00:00:00Z",
+      "author_meta": "Sahil A.",
+      "rating": 5,
+      "score": null,
+      "relevance": "high",
+      "relevance_reason": "Focuses on the setup speed and responsiveness of the Optimizely account and support teams.",
+      "verbatim_quotes": [
+        "Configured Commerce is quick to set up and customer support is quick to reply"
+      ]
+    },
+    {
+      "source": "g2",
+      "url": "https://www.g2.com/products/optimizely-configured-commerce",
+      "title": "\"Smooth and ease\"",
+      "date": "2023-12-07T00:00:00Z",
+      "author_meta": "Kailash T.",
+      "rating": 5,
+      "score": null,
+      "relevance": "high",
+      "relevance_reason": "Describes the user experience of the e-commerce platform specifically.",
+      "verbatim_quotes": [
+        "Really empathetic and smooth e-commerce platform"
+      ]
+    },
+    {
+      "source": "g2",
+      "url": "https://www.g2.com/products/optimizely-configured-commerce",
+      "title": "\"Very Quality Product that continues to evolve\"",
+      "date": "2023-01-30T00:00:00Z",
+      "author_meta": "Verified User in Construction",
+      "rating": 4,
+      "score": null,
+      "relevance": "high",
+      "relevance_reason": "Assesses the solid foundation of the product while noting specific UI challenges.",
+      "verbatim_quotes": [
+        "The foundation is very solid and meets our needs.",
+        "There are still just a few UI experiences that aren't the most user friendly."
+      ]
+    },
+    {
+      "source": "g2",
+      "url": "https://www.g2.com/products/optimizely-configured-commerce",
+      "title": "\"One of the best B2B commerce cloud framework.\"",
+      "date": "2022-08-03T00:00:00Z",
+      "author_meta": "Verified User in Program Development",
+      "rating": 5,
+      "score": null,
+      "relevance": "high",
+      "relevance_reason": "Reviewer emphasizes ease of customization and content editing within the framework.",
+      "verbatim_quotes": [
+        "I like its easy customization, easy upgrade and easy content editing."
+      ]
+    }
+  ],
+  "run_stats": {
+    "brand": "Optimizely",
+    "focus_area": null,
+    "time_window_days": 90,
+    "raw_fetched": 25,
+    "kept_high": 11,
+    "kept_low_focus": 0,
+    "dropped": 14,
+    "drop_reasons": {
+      "off_topic_entity_mismatch": 14,
+      "off_topic_focus_mismatch": 0,
+      "other": 0
+    },
+    "sources_succeeded": [
+      "reddit",
+      "g2"
+    ],
+    "sources_failed": []
+  }
+}
