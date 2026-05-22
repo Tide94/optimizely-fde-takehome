@@ -1,0 +1,131 @@
+{
+  "brand": "Optimizely",
+  "summary": "Customers value Optimizely for its unified content and personalization features, particularly its strength in handling complex B2B commerce workflows. While praised for its developer-friendly flexibility and rapid setup, some users identify minor UI friction.",
+  "themes": [
+    {
+      "rank": 1,
+      "name": "Unified platform streamlines content and personalization",
+      "frequency": 3,
+      "sentiment_skew": "positive",
+      "supporting_quotes": [
+        {
+          "quote": "Unified platform for content management",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        },
+        {
+          "quote": "Flexibility and scalability",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        },
+        {
+          "quote": "Not only does It optimize the digital experience for online shoppers but also it enhances personalization with ease & improves the conversion rate.",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        }
+      ],
+      "so_what": "Highlight the efficiency of managing both content and personalization in a single tool to appeal to teams looking to reduce tech stack complexity."
+    },
+    {
+      "rank": 2,
+      "name": "Seamless handling of complex B2B workflows",
+      "frequency": 2,
+      "sentiment_skew": "positive",
+      "supporting_quotes": [
+        {
+          "quote": "how this platform truly understands complex B2B needs",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        },
+        {
+          "quote": "handles our intricate product configurations and bulk ordering workflows effortlessly",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        }
+      ],
+      "so_what": "Differentiate from competitors by showcasing the platform's specialized ability to solve intricate B2B product and ordering logic."
+    },
+    {
+      "rank": 3,
+      "name": "Developer-friendly customization and commerce management",
+      "frequency": 2,
+      "sentiment_skew": "positive",
+      "supporting_quotes": [
+        {
+          "quote": "Built in commerce manager is a huge help for both product managers and developers",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        },
+        {
+          "quote": "I like its easy customization, easy upgrade and easy content editing.",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        }
+      ],
+      "so_what": "Position the built-in commerce manager as a bridge between technical and product teams to drive cross-functional adoption."
+    },
+    {
+      "rank": 4,
+      "name": "Comprehensive features deliver reliable business results",
+      "frequency": 2,
+      "sentiment_skew": "positive",
+      "supporting_quotes": [
+        {
+          "quote": "Their platform is very comprehensive and they offer a wide array of features.",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        },
+        {
+          "quote": "It's a reliable product which gives you desired results.",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        }
+      ],
+      "so_what": "Build prospect trust by emphasizing the reliability of results achieved through the platform's extensive and comprehensive toolkit."
+    },
+    {
+      "rank": 5,
+      "name": "Solid core foundation with minor UI friction",
+      "frequency": 2,
+      "sentiment_skew": "mixed",
+      "supporting_quotes": [
+        {
+          "quote": "The foundation is very solid and meets our needs.",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        },
+        {
+          "quote": "There are still just a few UI experiences that aren't the most user friendly.",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        }
+      ],
+      "so_what": "Assure potential buyers of the product's underlying stability while acknowledging and prioritizing UI improvements in the product roadmap."
+    },
+    {
+      "rank": 6,
+      "name": "Fast implementation and responsive customer support",
+      "frequency": 2,
+      "sentiment_skew": "positive",
+      "supporting_quotes": [
+        {
+          "quote": "Configured Commerce is quick to set up and customer support is quick to reply",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        },
+        {
+          "quote": "Really empathetic and smooth e-commerce platform",
+          "source": "g2",
+          "url": "https://www.g2.com/products/optimizely-configured-commerce"
+        }
+      ],
+      "so_what": "Use speed-to-market and high-quality support as a key selling point against enterprise competitors known for slow deployments."
+    }
+  ],
+  "coverage": {
+    "total_input_signals": 11,
+    "total_quotes_clustered": 13,
+    "themes_returned": 6,
+    "notable_gaps": "The feedback data is almost exclusively sourced from G2 reviews regarding the B2B commerce product line, leaving the CMS and experimentation segments underrepresented."
+  }
+}
