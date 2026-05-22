@@ -1,0 +1,65 @@
+{
+  "brand": "Optimizely",
+  "homepage_url": "https://www.optimizely.com",
+  "current_messaging": {
+    "hero": "AI-powered digital experiences that drive growth",
+    "subhead": "Create content fast. Personalize with ease. Test, analyze, and repeat. Then scale it all with AI and see what your team is capable of.",
+    "key_value_props": [
+      "Content Orchestration: Content and experiences that do everything but disappoint",
+      "Experience Optimization: Test, personalize, and analyze: good things come in threes",
+      "Commerce: Commerce with a clever twist"
+    ]
+  },
+  "gap_analysis": "Optimizely's current homepage leads with abstract AI-driven 'growth' and 'clever' marketing concepts, whereas customers specifically value the platform's ability to solve the 'intricate' and 'complex' pain points of B2B commerce. There is a significant disconnect between the brand's focus on speed/automation and the customer's appreciation for a 'unified platform' that provides the reliability and specialized logic required for B2B product configurations.",
+  "recommendations": [
+    {
+      "type": "hero",
+      "current": "AI-powered digital experiences that drive growth",
+      "suggested": "A platform that truly understands complex B2B needs.",
+      "grounded_in_theme": "Seamless handling of complex B2B workflows",
+      "customer_quote": "how this platform truly understands complex B2B needs",
+      "rationale": "Swapping generic growth claims for a direct customer validation of B2B expertise targets the high-intent enterprise audience looking for specialized workflow solutions."
+    },
+    {
+      "type": "subhead",
+      "current": "Create content fast. Personalize with ease. Test, analyze, and repeat. Then scale it all with AI and see what your team is capable of.",
+      "suggested": "The unified platform for content management that enhances personalization with ease and improves the conversion rate.",
+      "grounded_in_theme": "Unified platform streamlines content and personalization",
+      "customer_quote": "Not only does It optimize the digital experience for online shoppers but also it enhances personalization with ease & improves the conversion rate.",
+      "rationale": "By leading with the 'unified platform' framing, you address tech stack consolidation while using the customer's own language to describe the ease of driving results."
+    },
+    {
+      "type": "ad_headline",
+      "current": "Not currently stated",
+      "suggested": "Reliable results from a very comprehensive platform.",
+      "grounded_in_theme": "Comprehensive features deliver reliable business results",
+      "customer_quote": "It's a reliable product which gives you desired results.",
+      "rationale": "Leading with 'reliability' and 'results' counters the risks associated with enterprise software and establishes immediate credibility."
+    },
+    {
+      "type": "email_subject",
+      "current": "Not currently stated",
+      "suggested": "The commerce manager that's a huge help for both product managers and developers.",
+      "grounded_in_theme": "Developer-friendly customization and commerce management",
+      "customer_quote": "Built in commerce manager is a huge help for both product managers and developers",
+      "rationale": "Highlighting harmony between technical and product teams addresses a common pain point in buying software that needs to be implemented and operated by different groups."
+    },
+    {
+      "type": "hero",
+      "current": "AI-powered digital experiences that drive growth",
+      "suggested": "Handle your intricate product configurations and bulk ordering workflows effortlessly.",
+      "grounded_in_theme": "Seamless handling of complex B2B workflows",
+      "customer_quote": "handles our intricate product configurations and bulk ordering workflows effortlessly",
+      "rationale": "Leading with specific, concrete capabilities like 'intricate product configurations' differentiates Optimizely from generalist CMS providers."
+    },
+    {
+      "type": "ad_headline",
+      "current": "Not currently stated",
+      "suggested": "Quick to set up. Responsive support. Smooth e-commerce.",
+      "grounded_in_theme": "Fast implementation and responsive customer support",
+      "customer_quote": "Configured Commerce is quick to set up and customer support is quick to reply",
+      "rationale": "Implementation speed and support quality are primary triggers for enterprise software selection; showcasing efficiency directly counters the 'slow enterprise' stigma."
+    }
+  ],
+  "summary_for_stakeholder": "Optimizely's current messaging is heavily AI-focused, but customers consistently define its value through its ability to handle 'intricate product configurations' and its 'unified' nature. Our top recommendation is to shift the hero messaging from abstract AI growth to proving we 'truly understand complex B2B needs' to drive higher conversion with specialized enterprise buyers."
+}
